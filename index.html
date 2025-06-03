@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Préstamos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-money-check-alt"></i> Sistema de Gestión de Préstamos</h1>
+            <div class="theme-toggle">
+                <i class="fas fa-moon"></i>
+                <label class="switch">
+                    <input type="checkbox" id="theme-switch">
+                    <span class="slider round"></span>
+                </label>
+                <i class="fas fa-sun"></i>
+            </div>
+        </header>
+
+        <section class="alerts-section" id="alerts-container">
+            <h2><i class="fas fa-exclamation-triangle"></i> Alertas de Vencimiento</h2>
+            <div class="alerts-content" id="alerts-content">
+                <!-- Las alertas se generarán dinámicamente aquí -->
+            </div>
+        </section>
+
+        <main>
+            <div class="controls">
+                <button id="add-client-btn" class="btn primary"><i class="fas fa-user-plus"></i> Nuevo Cliente</button>
+                <button id="remove-undefined-btn" class="btn danger"><i class="fas fa-trash-alt"></i> Eliminar Registros Inválidos</button>
+                <div class="search-filters">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Buscar cliente...">
+                    </div>
+                    <div class="filter-group">
+                        <label for="status-filter">Estado:</label>
+                        <select id="status-filter">
+                            <option value="todos">Todos</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="retraso">Retraso</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="date-filter">Desde:</label>
+                        <input type="date" id="date-filter">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="clients-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Número de Crédito <i class="fas fa-sort"></i></th>
+                            <th data-sort="id">Cédula <i class="fas fa-sort"></i></th>
+                            <th data-sort="loanDate">Número de Celular <i class="fas fa-sort"></i></th>
+                            <th data-sort="amount">Nombre Completo <i class="fas fa-sort"></i></th>
+                            <th data-sort="installments">Fecha Vencimiento <i class="fas fa-sort"></i></th>
+                            <th data-sort="installmentValue">Número Cuotas <i class="fas fa-sort"></i></th>
+                            <th data-sort="nextDueDate">Valor Cuota <i class="fas fa-sort"></i></th>
+                            <th data-sort="status">Estado <i class="fas fa-sort"></i></th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clients-list">
+                        <!-- Los clientes se generarán dinámicamente aquí -->
+                    </tbody>
+                </table>
+                <div id="no-results" class="no-results hidden">
+                    <i class="fas fa-search"></i>
+                    <p>No se encontraron resultados</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modal para agregar/editar cliente -->
+        <div class="modal" id="client-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Nuevo Cliente</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="client-form">
+                        <input type="hidden" id="client-id">
+                        <div class="form-group">
+                            <label for="client-name">Número de Crédito:</label>
+                            <input type="text" id="client-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-identification">Cédula/Identificación:</label>
+                            <input type="text" id="client-identification" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loan-date">Número de Celular:</label>
+                            <input type="tel" id="loan-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loan-amount">Nombre Completo:</label>
+                            <input type="text" id="loan-amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="total-installments">Fecha de Próximo Vencimiento:</label>
+                            <input type="date" id="total-installments" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="installment-value">Número de Cuotas:</label>
+                            <input type="number" id="installment-value" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="next-due-date">Valor de la Cuota:</label>
+                            <input type="number" id="next-due-date" min="1" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-status">Estado:</label>
+                            <select id="client-status" required>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="retraso">Retraso</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn secondary" id="cancel-btn">Cancelar</button>
+                            <button type="submit" class="btn primary">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div class="modal" id="confirm-modal">
+            <div class="modal-content confirm-content">
+                <div class="modal-header">
+                    <h2>Confirmar Acción</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p id="confirm-message">¿Está seguro que desea eliminar este cliente?</p>
+                    <div class="form-actions">
+                        <button type="button" class="btn secondary" id="cancel-confirm-btn">Cancelar</button>
+                        <button type="button" class="btn danger" id="confirm-action-btn">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast para notificaciones -->
+        <div id="toast" class="toast">
+            <div class="toast-content">
+                <i id="toast-icon" class="fas"></i>
+                <div class="toast-message" id="toast-message"></div>
+            </div>
+            <div class="toast-progress"></div>
+        </div>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+</html>
